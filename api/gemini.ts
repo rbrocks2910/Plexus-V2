@@ -57,7 +57,7 @@ export default async function handler(request: Request) {
 
                 const lastUserMessage = chatHistory[chatHistory.length - 1].text;
                 const chat = ai.chats.create({
-                    model: 'gemini-2.5-flash',
+                    model: 'gemini-flash-latest',
                     config: { systemInstruction },
                     history: chatHistory.slice(0, -1).map(msg => ({
                         role: msg.sender === 'user' ? 'user' : 'model',
@@ -73,7 +73,7 @@ export default async function handler(request: Request) {
                 const prompt = `You are a medical lab/radiology reporting system. Based on the patient case with the diagnosis of "${patientCase.internalDiagnosis}", generate a realistic result for the following investigation: "${testName}". The result should be clinically relevant and consistent with the diagnosis but should NOT explicitly state the diagnosis. For example, if the diagnosis is myocardial infarction, an ECG might show ST-segment elevation. Present the result in a professional report format. Output as a JSON object.`;
 
                 const response = await model.generateContent({
-                    model: 'gemini-2.5-flash',
+                    model: 'gemini-flash-latest',
                     contents: prompt,
                     config: {
                         responseMimeType: "application/json",
@@ -126,7 +126,7 @@ export default async function handler(request: Request) {
                 const { userDiagnosis, confidence, chatHistory, investigations, differentialDiagnosis, patientCase } = payload as { userDiagnosis: string, confidence: number, chatHistory: ChatMessage[], investigations: Investigation[], differentialDiagnosis: string[], patientCase: PatientCase };
                 const prompt = `You are a medical education assessment AI. The correct diagnosis for this case was "${patientCase.internalDiagnosis}". The student submitted a diagnosis of "${userDiagnosis}" with ${confidence}% confidence. 
                     Analyze the student's performance based on the conversation history, ordered investigations, and their differential diagnosis list.
-                    A key part of your analysis must be a critique of the student's diagnostic methodology. Compare their sequence of actions (history taking, physical exams, investigations) against the standard, logical clinical workflow for a patient presenting with "${patientCase.chiefComplaint}". Comment on whether their approach was efficient and followed a logical sequence (e.g., history -> exam -> basic tests -> advanced tests) or if they jumped to conclusions.
+                    A key part of your analysis must be a critique of the student's diagnostic methodology. Compare their sequence of actions (history taking, physical exams, investigations) against the standard, logical clinical workflow for a patient presenting with "${patientCase.chiefComplaint}". Comment on whether their approach was an efficient and followed a logical sequence (e.g., history -> exam -> basic tests -> advanced tests) or if they jumped to conclusions.
                     Provide a comprehensive feedback report. Format the output as a single JSON object.`;
 
                 const response = await model.generateContent({
